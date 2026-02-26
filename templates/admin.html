@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Admin Panel</h1>
+
+  <h2 style="font-size: 16px; margin: 24px 0 8px;">Pending Accounts</h2>
+  {% if pending %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in pending %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.email }}</td>
+        <td style="display: flex; gap: 8px; padding: 8px 12px;">
+          <form method="post" action="/admin/approve">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <button type="submit" class="btn btn-success" style="padding: 6px 14px; font-size: 13px;">Approve</button>
+          </form>
+          <form method="post" action="/admin/reject">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <button type="submit" class="btn btn-danger" style="padding: 6px 14px; font-size: 13px;"
+              onclick="return confirm('Delete this user?')">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #888;">No pending accounts.</p>
+  {% endif %}
+
+  <h2 style="font-size: 16px; margin: 32px 0 8px;">Approved Accounts</h2>
+  {% if approved %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Admin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in approved %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ "Yes" if u.is_admin else "No" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: #888;">No approved accounts yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

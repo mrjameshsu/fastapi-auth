@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Welcome, {{ user.email }}</h1>
+  <p style="color: #666; margin-bottom: 24px;">You are logged in as an {% if user.is_admin %}admin{% else %}approved user{% endif %}.</p>
+  <div class="links">
+    <a href="/location" class="btn">My Location</a>
+    <a href="/map" class="btn">Shared Map</a>
+    {% if user.is_admin %}
+    <a href="/admin" class="btn">Admin Panel</a>
+    {% endif %}
+    <a href="/logout" class="btn btn-danger">Logout</a>
+  </div>
+</div>
+{% endblock %}

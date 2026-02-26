@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My Location{% endblock %}
+{% block head %}
+{% if location %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>My Location</h1>
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  {% if location %}
+  <p style="color: #666; margin-bottom: 12px;">
+    Current: <strong>{{ location.display_address }}</strong>
+    &mdash; Last updated: {{ location.last_updated.strftime('%Y-%m-%d %H:%M UTC') if location.last_updated else 'Unknown' }}
+  </p>
+  <div id="map" style="height: 320px; border-radius: 6px; margin-bottom: 24px;"></div>
+  {% else %}
+  <p style="color: #666; margin-bottom: 24px;">You haven't set a location yet. Enter an address below.</p>
+  {% endif %}
+
+  <h2 style="font-size: 16px; margin-bottom: 16px;">Update Location</h2>
+  <form method="post" action="/location" style="max-width: 500px;">
+    <label for="address">Address</label>
+    <input type="text" id="address" name="address" placeholder="e.g. 1600 Amphitheatre Pkwy, Mountain View, CA" required>
+    <button type="submit">Update Location</button>
+  </form>
+</div>
+
+{% if location %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const lat = {{ location.latitude }};
+  const lon = {{ location.longitude }};
+  const map = L.map('map').setView([lat, lon], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  L.marker([lat, lon])
+    .addTo(map)
+    .bindPopup({{ location.display_address | tojson }})
+    .openPopup();
+</script>
+{% endif %}
+{% endblock %}

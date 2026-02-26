@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Shared Map{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Shared Map</h1>
+  {% if locations %}
+  <p style="color: #666; margin-bottom: 16px;">Showing {{ locations | length }} user location(s).</p>
+  <div id="map" style="height: 500px; border-radius: 6px;"></div>
+  {% else %}
+  <p style="color: #666;">No locations have been shared yet. Ask users to set their location.</p>
+  {% endif %}
+</div>
+
+{% if locations %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const locations = {{ locations | tojson }};
+  const map = L.map('map');
+
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  const bounds = [];
+  locations.forEach(loc => {
+    bounds.push([loc.latitude, loc.longitude]);
+    L.marker([loc.latitude, loc.longitude])
+      .addTo(map)
+      .bindTooltip(`<b>${loc.email}</b><br>${loc.display_address}`)
+      .bindPopup(`<b>${loc.email}</b><br>${loc.display_address}<br><em>Updated: ${loc.last_updated}</em>`);
+  });
+
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 13);
+  } else if (bounds.length > 1) {
+    map.fitBounds(bounds, { padding: [30, 30] });
+  } else {
+    map.setView([20, 0], 2);
+  }
+</script>
+{% endif %}
+{% endblock %}
